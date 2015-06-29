@@ -29,7 +29,7 @@
 
 @protocol AutocompleteTextFieldDelegate;
 
-@interface AutocompleteTextField : UITextField <UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate>
+@interface AutocompleteTextField : UITextField <UITextFieldDelegate, UITableViewDelegate, UITableViewDataSource>
 
 @property (nonatomic, weak) id <UITextFieldDelegate, AutocompleteTextFieldDelegate> delegate;
 
@@ -46,5 +46,6 @@
 - (int)minCharToStartFilter:(AutocompleteTextField *)textField;
 - (BOOL)suggestionsIsDisplayedBelowTextField:(AutocompleteTextField *)textField;
 - (void)didSelectSuggestion:(AutocompleteTextField *)textField obj:(id)obj;
+- (UITableView *)tableViewForTextField:(AutocompleteTextField *)textField;
 
 @end

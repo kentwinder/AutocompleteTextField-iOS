@@ -36,6 +36,7 @@
 UITableView *dataTableView;
 NSArray *filteredData;
 BOOL shouldDisplayBelowTextField = YES;
+BOOL isInsideTableView = NO;
 
 - (void)layoutSubviews {
     [super layoutSubviews];
@@ -50,6 +51,10 @@ BOOL shouldDisplayBelowTextField = YES;
         if ([dataTableView superview] != nil) {
             [dataTableView removeFromSuperview];
         }
+        
+        if ([[self delegate] respondsToSelector:@selector(tableViewForTextField:)]) {
+            [[self delegate] tableViewForTextField:self].scrollEnabled = YES;
+        }
     }
 }
 
@@ -61,6 +66,15 @@ BOOL shouldDisplayBelowTextField = YES;
     } else {
         filteredData = nil;
     }
+    if ([[self delegate] respondsToSelector:@selector(tableViewForTextField:)]
+        && [[self delegate] tableViewForTextField:self] != nil) {
+        isInsideTableView = YES;
+        if ([filteredData count] > 0) {
+            [[self delegate] tableViewForTextField:self].scrollEnabled = NO;
+        } else {
+            [[self delegate] tableViewForTextField:self].scrollEnabled = YES;
+        }
+    }
 }
 
 - (void)showData {
@@ -69,7 +83,13 @@ BOOL shouldDisplayBelowTextField = YES;
         dataTableView.delegate = self;
         dataTableView.dataSource = self;
         dataTableView.backgroundColor = [UIColor clearColor];
-        [[self superview] addSubview:dataTableView];
+        if  (isInsideTableView) {
+            UIWindow* mainWindow = [[UIApplication sharedApplication] keyWindow];
+            [mainWindow addSubview:dataTableView];
+        } else {
+            [[self superview] addSubview:dataTableView];
+            
+        }
         
         dataTableView.alpha = 0.0;
         [UIView animateWithDuration:0.3
@@ -81,11 +101,11 @@ BOOL shouldDisplayBelowTextField = YES;
         [dataTableView reloadData];
     }
     
-    int tableHeight = 176; // show 4 cells by default (44 * 4)
+    NSInteger tableHeight = 176; // show 4 cells by default (44 * 4)
     if ([filteredData count] < 4) {
         tableHeight = 44 * [filteredData count];
     }
-    CGRect frameForPresentation = [self frame];
+    CGRect frameForPresentation = [self convertRect:self.bounds toView:nil];
     if (shouldDisplayBelowTextField) {
         frameForPresentation.origin.y += self.frame.size.height;
     } else {
@@ -100,6 +120,7 @@ BOOL shouldDisplayBelowTextField = YES;
     }
 }
 
+#pragma mark - Optional data
 - (int)minLenth {
     int min = 0;
     if ([[self delegate] respondsToSelector:@selector(minCharToStartFilter:)]) {

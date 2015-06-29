@@ -28,4 +28,8 @@ Implement the following delegate methods of AutocompleteTextFieldDelegate.
 	
 	- (void)didSelectSuggestion:(AutocompleteTextField *)textField obj:(id)obj;
 
+@optional - If TextField is inside TableView, specify it so that the result will be displayed properly
+
+	- (UITableView *)tableViewForTextField:(AutocompleteTextField *)textField;
+
 There is one small example in the project
